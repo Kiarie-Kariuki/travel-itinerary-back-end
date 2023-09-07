@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from database import Base, Session, engine
 from datetime import datetime
 from destination import Destination
-from trip import update_budget
+from budget import update_budget
 
 Session = sessionmaker(bind=engine)
 
