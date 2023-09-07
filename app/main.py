@@ -5,7 +5,7 @@ from destination import add_destination, Destination
 from activity import schedule_activity, Activity
 from datetime import datetime
 from budget import update_budget
-from trip_management import list_user_trips
+from trip_management import list_user_trips, delete_activity
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -35,6 +35,9 @@ def main(username, password):
         create_user(username, password)
         print(f'Welcome, {username}!')
 
+    print()
+    print()
+    print("WELCOME TO TRAVEL ITENERARY!")
 
     while True:
         print("\nMain Menu:")
@@ -43,7 +46,8 @@ def main(username, password):
         print("3. Schedule an activity")
         print("4. View all trips")
         print("5. Delete a trip")
-        print("6. Exit")
+        print("6. Delete an activity")
+        print("7. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -59,14 +63,16 @@ def main(username, password):
             activity_date = datetime.strptime(input("Enter activity date (YYYY-MM-DD HH:MM:SS): "), '%Y-%m-%d %H:%M:%S')
             activity_description = input("Enter activity description: ")
             activity_cost = float(input("Enter activity cost: "))
-            
             schedule_activity(destination_id, activity_name, activity_date, activity_description, activity_cost)
         elif choice == "4":
             list_user_trips(user.id)
         elif choice == "5":
             trip_id = int(input("Enter the ID of the trip you want to delete: "))
-            delete_trip(trip_id) 
+            delete_trip(trip_id)
         elif choice == "6":
+            activity_id = int(input("Enter the ID of the activity you want to delete: "))
+            delete_activity(activity_id)
+        elif choice == "7":
             print("Goodbye!")
             break
         else:
