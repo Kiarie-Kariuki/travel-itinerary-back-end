@@ -1,10 +1,10 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Delete
 from sqlalchemy.orm import relationship, sessionmaker
 from database import Base, Session, engine, db
 from user import User
 from destination import Destination
+from activity import Activity
 from datetime import datetime
-from sqlalchemy import update
 from flask import current_app
 
 
@@ -109,22 +109,25 @@ def generate_travel_summary(user_id):
 
     session.close()
 
-def update_budget(destination_id, cost):
+
+
+def delete_trip(trip_id):
     session = Session()
-    
-    # Check if the destination exists
-    destination = session.query(Destination).filter_by(id=destination_id).first()
 
-    if destination:
-        trip = destination.trip
+    # Query and delete all activities associated with the destinations of the trip
+    destination_ids = session.query(Destination.id).filter_by(trip_id=trip_id).all()
+    if destination_ids:
+        # Convert the list of IDs into a flat list
+        destination_ids = [id for (id,) in destination_ids]
+        session.query(Activity).filter(Activity.destination_id.in_(destination_ids)).delete(synchronize_session=False)
 
-        if trip.budget >= cost:
-            trip.budget -= cost
-            session.commit()
-            print("Budget updated successfully.")
-        else:
-            print("Insufficient budget for this activity.")
-    else:
-        print("Destination not found.")
+    # Delete the destinations associated with the trip
+    session.query(Destination).filter_by(trip_id=trip_id).delete(synchronize_session=False)
+
+    # Delete the trip itself
+    session.query(Trip).filter_by(id=trip_id).delete(synchronize_session=False)
+
+    session.commit()
+    print(f"Trip with ID {trip_id} deleted.")
 
     session.close()
